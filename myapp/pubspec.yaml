@@ -12,11 +12,17 @@ dependencies:
 
   cupertino_icons: ^0.1.2
   firebase_auth: ^0.14.0+5
-  firebase_database: ^3.0.7
+  firebase_database: ^3.0.7 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.5"
+
+flutter_icons:
+  image_path: "assets/images/virus-icon.png" 
+  android: true
+  ios: true
 
 flutter:
 
