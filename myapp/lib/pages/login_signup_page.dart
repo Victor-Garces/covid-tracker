@@ -32,6 +32,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   @override
   Widget build(BuildContext context) {
       return new Scaffold(
+        backgroundColor: Colors.amber[50],
         appBar: new AppBar(
           title: new Text("Covid App")
         ),
@@ -159,7 +160,6 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
           widget.loginCallback();
         }
       } catch (e) {
-        print('Error: $e');
         setState(() {
           _isLoading = false;
           _errorMessage = e.message;
