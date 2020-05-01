@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/abstractions/base_auth.dart';
+import 'package:myapp/components/app_drawer.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.auth, this.userId, this.logoutCallback})
@@ -28,64 +29,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: signOut)
           ],
         ),
-        drawer: Theme(
-          data: Theme.of(context).copyWith(
-            canvasColor: Colors.amber[50],
-          ),
-          child: Drawer(
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: <Widget>[
-                      DrawerHeader(
-                        child: Text(
-                          '',
-                          style: TextStyle(color: Colors.white, fontSize: 24),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/virus-icon.png'),
-                            alignment: Alignment.center,
-                          ),
-                        ),
-                      ),
-                      buildListTile('Inicio', Icons.home, context),
-                      buildListTile('Buscar', Icons.search, context),
-                      buildListTile('Contactos', Icons.contacts, context),
-                    ],
-                  ),
-                ),
-                Container(
-                    child: Align(
-                        alignment: FractionalOffset.bottomCenter,
-                        child: Container(
-                            child: Column(
-                          children: <Widget>[
-                            Divider(),
-                            buildListTile(
-                                'Configuración', Icons.settings, context),
-                            buildListTile(
-                                'Ayuda y recomendaciones', Icons.help, context),
-                          ],
-                        ))))
-              ],
-            ),
-          ),
-        ));
-  }
-
-  ListTile buildListTile(String text, IconData iconData, BuildContext context) {
-    print('Im here');
-    return ListTile(
-      leading: Icon(iconData),
-      title: Text(text),
-      onTap: () {
-        Navigator.pop(context);
-      },
-    );
+        drawer: AppDrawer());
   }
 
   signOut() async {
