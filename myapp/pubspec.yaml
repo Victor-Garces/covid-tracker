@@ -16,6 +16,7 @@ dependencies:
   nearby_connections: ^1.1.1+1
   image_picker: ^0.6.5+3
   page_transition: ^1.1.5
+  settings_ui: ^0.2.0
 
 dev_dependencies:
   flutter_test:

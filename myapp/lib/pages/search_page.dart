@@ -18,7 +18,6 @@ class SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.amber[50],
         appBar: AppBar(
           title: const Text('Covid App'),
         ),

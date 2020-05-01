@@ -1,24 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/abstractions/base_auth.dart';
 import 'package:myapp/enums/auth_status.dart';
+import 'package:myapp/interfaces/base_auth.dart';
 import 'package:myapp/pages/login_signup_page.dart';
 
 import 'home_page.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth});
-  
+
   final BaseAuth auth;
 
   @override
   State<StatefulWidget> createState() => new _RootPageState();
 }
-  
-class _RootPageState extends State<RootPage>{
-  var authStatus = AuthStatus.NOT_DETERMINED;  
+
+class _RootPageState extends State<RootPage> {
+  var authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
-  
+
   @override
   Widget build(BuildContext context) {
     switch (authStatus) {
@@ -33,11 +33,7 @@ class _RootPageState extends State<RootPage>{
         break;
       case AuthStatus.LOGGED_IN:
         if (_userId.length > 0 && _userId != null) {
-          return new HomePage(
-            userId: _userId,
-            auth: widget.auth,
-            logoutCallback: logoutCallback,
-          );
+          return new HomePage();
         } else
           return buildWaitingScreen();
         break;
@@ -63,7 +59,8 @@ class _RootPageState extends State<RootPage>{
         if (user != null) {
           _userId = user?.uid;
         }
-        authStatus = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+        authStatus =
+            user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
       });
     });
   }
@@ -76,13 +73,6 @@ class _RootPageState extends State<RootPage>{
     });
     setState(() {
       authStatus = AuthStatus.LOGGED_IN;
-    });
-  }
-
-  void logoutCallback() {
-    setState(() {
-      authStatus = AuthStatus.NOT_LOGGED_IN;
-      _userId = "";
     });
   }
 }
