@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/enums/auth_status.dart';
 import 'package:myapp/interfaces/base_auth.dart';
-import 'package:myapp/pages/login_signup_page.dart';
 
 import 'home_page.dart';
+import 'login_page.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({this.auth});
@@ -26,7 +26,7 @@ class _RootPageState extends State<RootPage> {
         return buildWaitingScreen();
         break;
       case AuthStatus.NOT_LOGGED_IN:
-        return new LoginSignupPage(
+        return new LoginPage(
           auth: widget.auth,
           loginCallback: loginCallback,
         );
