@@ -28,6 +28,7 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _formKey = new GlobalKey<FormState>();
   final _birthdayController = TextEditingController();
+  final _locationController = TextEditingController();
 
   SignupForm signupForm = SignupForm();
 
@@ -229,6 +230,7 @@ class _SignupPageState extends State<SignupPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: new TextFormField(
+        controller: _locationController,
         readOnly: true,
         maxLines: 1,
         autofocus: false,
@@ -247,10 +249,20 @@ class _SignupPageState extends State<SignupPage> {
               PageTransition(
                 type: PageTransitionType.fade,
                 child: MapsPage(),
-              ));
+              )).then((location) {
+            fillLocationInput(location);
+          });
         },
       ),
     );
+  }
+
+  void fillLocationInput(location) {
+    double latitude = location.latitude;
+    double longitude = location.longitude;
+    String coordinates = "$latitude, $longitude";
+    _locationController.text = coordinates;
+    signupForm.location = coordinates;
   }
 
   Widget showPrimaryButton() {
@@ -278,9 +290,8 @@ class _SignupPageState extends State<SignupPage> {
       _isLoading = true;
     });
     if (validateAndSave()) {
-      String userId = "";
       try {
-        userId =
+        String userId =
             await widget.auth.signUp(signupForm.email, signupForm.password);
         print('Signed up user: $userId');
         setState(() {
