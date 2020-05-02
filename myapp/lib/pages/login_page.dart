@@ -55,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
               showPasswordInput(),
               showPrimaryButton(),
               showSecondaryButton(),
-              showErrorMessage(),
             ],
           )),
     );
@@ -168,6 +167,10 @@ class _LoginPageState extends State<LoginPage> {
           _formKey.currentState.reset();
         });
       }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -189,36 +192,18 @@ class _LoginPageState extends State<LoginPage> {
 
   void openSignupForm() {
     resetForm();
-    Navigator.pushAndRemoveUntil(
+    Navigator.push(
         context,
         PageTransition(
           type: PageTransitionType.fade,
           child: SignupPage(
             auth: new Auth(),
           ),
-        ),
-        (Route<dynamic> route) => false);
+        ));
   }
 
   void resetForm() {
     _formKey.currentState.reset();
     _errorMessage = "";
-  }
-
-  Widget showErrorMessage() {
-    if (_errorMessage.length > 0 && _errorMessage != null) {
-      return new Text(
-        _errorMessage,
-        style: TextStyle(
-            fontSize: 13.0,
-            color: Colors.red,
-            height: 1.0,
-            fontWeight: FontWeight.w300),
-      );
-    } else {
-      return new Container(
-        height: 0.0,
-      );
-    }
   }
 }

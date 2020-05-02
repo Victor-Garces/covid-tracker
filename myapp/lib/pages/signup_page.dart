@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/interfaces/base_auth.dart';
+import 'package:myapp/pages/maps_page.dart';
 import 'package:myapp/pages/root_page.dart';
 import 'package:myapp/services/auth.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:intl/intl.dart';
 
 class SignupForm {
   String name;
@@ -10,7 +12,7 @@ class SignupForm {
   String phone;
   String email;
   String password;
-  String birthday;
+  DateTime birthday;
   String location;
 }
 
@@ -25,6 +27,8 @@ class SignupPage extends StatefulWidget {
 
 class _SignupPageState extends State<SignupPage> {
   final _formKey = new GlobalKey<FormState>();
+  final _birthdayController = TextEditingController();
+
   SignupForm signupForm = SignupForm();
 
   @override
@@ -58,13 +62,13 @@ class _SignupPageState extends State<SignupPage> {
           child: new ListView(
             shrinkWrap: true,
             children: <Widget>[
-              // showLogo(),
               showNameInput(),
               showLastnameInput(),
               showPhoneInput(),
               showEmailInput(),
               showPasswordInput(),
               showBirthdayInput(),
+              showLocationInput(),
               showPrimaryButton(),
               showSecondaryButton(),
               showErrorMessage(),
@@ -81,20 +85,6 @@ class _SignupPageState extends State<SignupPage> {
           height: 0,
           width: 0,
         );
-
-  Widget showLogo() {
-    return new Hero(
-      tag: 'hero',
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(0.0, 70.0, 0.0, 0.0),
-        child: CircleAvatar(
-          backgroundColor: Colors.transparent,
-          radius: 60.0,
-          child: Image.asset('assets/images/virus-icon.png'),
-        ),
-      ),
-    );
-  }
 
   Widget showNameInput() {
     return Padding(
@@ -198,6 +188,8 @@ class _SignupPageState extends State<SignupPage> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: new TextFormField(
+        controller: _birthdayController,
+        readOnly: true,
         maxLines: 1,
         keyboardType: TextInputType.datetime,
         autofocus: false,
@@ -207,10 +199,56 @@ class _SignupPageState extends State<SignupPage> {
               Icons.date_range,
               color: Colors.grey,
             )),
-        validator: (value) => value.isEmpty
+        validator: (value) => signupForm.birthday == null
             ? 'La fecha de nacimiento no puede estar vacía'
             : null,
-        onSaved: (value) => signupForm.birthday = value.trim(),
+        onTap: () {
+          showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2018),
+            lastDate: DateTime(2030),
+            builder: (BuildContext context, Widget child) {
+              return Theme(
+                data: ThemeData.dark(),
+                child: child,
+              );
+            },
+          ).then((date) {
+            setState(() {
+              signupForm.birthday = date;
+              _birthdayController.text = DateFormat('dd/MM/yyyy').format(date);
+            });
+          });
+        },
+      ),
+    );
+  }
+
+  Widget showLocationInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: new TextFormField(
+        readOnly: true,
+        maxLines: 1,
+        autofocus: false,
+        decoration: new InputDecoration(
+            hintText: 'Ubicación',
+            icon: new Icon(
+              Icons.location_on,
+              color: Colors.grey,
+            )),
+        validator: (value) =>
+            value.isEmpty ? 'La ubicación no puede estar vacía' : null,
+        onSaved: (value) => signupForm.location = value,
+        onTap: () {
+          Navigator.push(
+              context,
+              PageTransition(
+                type: PageTransitionType.fade,
+                child: MapsPage(),
+              ));
+        },
       ),
     );
   }
@@ -236,35 +274,33 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void validateAndSubmit() async {
-    // setState(() {
-    //   _errorMessage = "";
-    //   _isLoading = true;
-    // });
-    // if (validateAndSave()) {
-    //   String userId = "";
-    //   try {
-    //     if (_isLoginForm) {
-    //       userId = await widget.auth.signIn(_email, _password);
-    //       print('Signed in: $userId');
-    //     } else {
-    //       userId = await widget.auth.signUp(_email, _password);
-    //       print('Signed up user: $userId');
-    //     }
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
+    setState(() {
+      _isLoading = true;
+    });
+    if (validateAndSave()) {
+      String userId = "";
+      try {
+        userId =
+            await widget.auth.signUp(signupForm.email, signupForm.password);
+        print('Signed up user: $userId');
+        setState(() {
+          _isLoading = false;
+        });
 
-    //     if (userId.length > 0 && userId != null && _isLoginForm) {
-    //       widget.loginCallback();
-    //     }
-    //   } catch (e) {
-    //     setState(() {
-    //       _isLoading = false;
-    //       _errorMessage = e.message;
-    //       _formKey.currentState.reset();
-    //     });
-    //   }
-    // }
+        if (userId.length > 0 && userId != null) {
+          openLoginForm();
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+          _formKey.currentState.reset();
+        });
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   bool validateAndSave() {
@@ -316,5 +352,11 @@ class _SignupPageState extends State<SignupPage> {
         height: 0.0,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _birthdayController.dispose();
+    super.dispose();
   }
 }
