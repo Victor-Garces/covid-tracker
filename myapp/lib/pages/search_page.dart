@@ -19,7 +19,8 @@ class SearchPageState extends State<SearchPage> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Covid App'),
+          title: Text('Covid Tracker'),
+          centerTitle: true,
         ),
         drawer: AppDrawer(),
         body: Body(),

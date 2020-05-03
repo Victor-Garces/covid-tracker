@@ -4,6 +4,7 @@ import 'package:myapp/pages/home_page.dart';
 import 'package:myapp/pages/search_page.dart';
 import 'package:myapp/pages/settings_page.dart';
 import 'package:myapp/services/auth_service.dart';
+import 'package:page_transition/page_transition.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -69,9 +70,11 @@ class AppDrawer extends StatelessWidget {
       onTap: () {
         if (page != null) {
           Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
+              context,
+              PageTransition(
+                type: PageTransitionType.fade,
+                child: page,
+              ));
         }
       },
     );

@@ -18,7 +18,10 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new AppBar(title: new Text('Covid App')),
+      appBar: AppBar(
+        title: Text('Covid Tracker'),
+        centerTitle: true,
+      ),
       body: SettingsList(
         sections: [
           SettingsSection(
