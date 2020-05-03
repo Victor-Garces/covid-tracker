@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/components/multi_select_dialog.dart';
 import 'package:myapp/interfaces/base_auth.dart';
+import 'package:myapp/interfaces/base_disease.dart';
+import 'package:myapp/interfaces/base_user.dart';
+import 'package:myapp/models/signup_form/signup_form.dart';
 import 'package:myapp/pages/maps_page.dart';
 import 'package:myapp/pages/root_page.dart';
-import 'package:myapp/services/auth.dart';
+import 'package:myapp/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:intl/intl.dart';
 
-class SignupForm {
+class DiseaseViewModel {
+  DiseaseViewModel([this.id, this.name, this.checked]);
+
+  int id;
   String name;
-  String lastname;
-  String phone;
-  String email;
-  String password;
-  DateTime birthday;
-  String location;
+  bool checked;
 }
 
 class SignupPage extends StatefulWidget {
-  SignupPage({this.auth});
+  SignupPage({this.auth, this.user, this.disease});
 
   final BaseAuth auth;
+  final BaseUser user;
+  final BaseDisease disease;
 
   @override
   State<StatefulWidget> createState() => new _SignupPageState();
@@ -34,14 +38,22 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   void initState() {
-    _errorMessage = "";
-    _isLoading = false;
     super.initState();
+    _isLoading = false;
+    widget.disease.getDiseases().then((value) {
+      setState(() {
+        _diseases.sort((a, b) => a.id.compareTo(b.id));
+        _diseases = value.map((value) {
+          return new DiseaseViewModel(value.id, value.name, false);
+        }).toList();
+      });
+    });
   }
 
-  String _errorMessage;
-
   bool _isLoading;
+  List<DiseaseViewModel> _diseases = new List();
+  List<MultiSelectDialogItem<int>> multiItem = List();
+  List<int> _selectedValues = new List();
 
   @override
   Widget build(BuildContext context) {
@@ -56,24 +68,26 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget showForm() {
+    var widgets = [
+      showNameInput(),
+      showLastnameInput(),
+      showPhoneInput(),
+      showEmailInput(),
+      showPasswordInput(),
+      showBirthdayInput(),
+      showLocationInput(),
+      showDiseasesMultiSelectDialog(),
+      showPrimaryButton(),
+      showSecondaryButton(),
+    ];
+
     return new Container(
       padding: EdgeInsets.all(16.0),
       child: new Form(
           key: _formKey,
           child: new ListView(
             shrinkWrap: true,
-            children: <Widget>[
-              showNameInput(),
-              showLastnameInput(),
-              showPhoneInput(),
-              showEmailInput(),
-              showPasswordInput(),
-              showBirthdayInput(),
-              showLocationInput(),
-              showPrimaryButton(),
-              showSecondaryButton(),
-              showErrorMessage(),
-            ],
+            children: widgets,
           )),
     );
   }
@@ -89,7 +103,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget showNameInput() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       child: new TextFormField(
         maxLines: 1,
         keyboardType: TextInputType.text,
@@ -207,8 +221,8 @@ class _SignupPageState extends State<SignupPage> {
           showDatePicker(
             context: context,
             initialDate: DateTime.now(),
-            firstDate: DateTime(2018),
-            lastDate: DateTime(2030),
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
             builder: (BuildContext context, Widget child) {
               return Theme(
                 data: ThemeData.dark(),
@@ -257,6 +271,48 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
+  Widget showDiseasesMultiSelectDialog() {
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(30.0, 15.0, 130.0, 0.0),
+      child: SizedBox(
+        height: 35.0,
+        child: new RaisedButton(
+          shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0)),
+          color: Colors.white70,
+          child: new Text(
+            'Seleccionar aflicciones',
+            style: new TextStyle(fontSize: 15.0, color: Colors.black),
+          ),
+          onPressed: showMultiSelect,
+        ),
+      ),
+    );
+  }
+
+  void showMultiSelect() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new MultiSelectDialog(
+            dialogTitle: 'Aflicciones',
+            initialSelectedValues: _diseases
+                .where((value) => _selectedValues.contains(value.id))
+                .map((value) => value.id)
+                .toSet(),
+            items: _diseases.map((disease) {
+              return new MultiSelectDialogItem(disease.id, disease.name);
+            }).toList(),
+            leftButtonName: 'Cancelar',
+          );
+        }).then((values) {
+      if (values != null) {
+        _selectedValues = values.toList();
+        // signupForm.diseasesIds = _selectedValues;
+      }
+    });
+  }
+
   void fillLocationInput(location) {
     double latitude = location.latitude;
     double longitude = location.longitude;
@@ -267,7 +323,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Widget showPrimaryButton() {
     return new Padding(
-      padding: EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
+      padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
       child: SizedBox(
         height: 40.0,
         child: new RaisedButton(
@@ -293,12 +349,13 @@ class _SignupPageState extends State<SignupPage> {
       try {
         String userId =
             await widget.auth.signUp(signupForm.email, signupForm.password);
-        print('Signed up user: $userId');
-        setState(() {
-          _isLoading = false;
-        });
 
         if (userId.length > 0 && userId != null) {
+          signupForm.id = userId;
+          widget.user.createUser(signupForm);
+          setState(() {
+            _isLoading = false;
+          });
           openLoginForm();
         }
       } catch (e) {
@@ -337,7 +394,7 @@ class _SignupPageState extends State<SignupPage> {
         PageTransition(
           type: PageTransitionType.fade,
           child: RootPage(
-            auth: new Auth(),
+            auth: new AuthService(),
           ),
         ),
         (Route<dynamic> route) => false);
@@ -345,24 +402,6 @@ class _SignupPageState extends State<SignupPage> {
 
   void resetForm() {
     _formKey.currentState.reset();
-    _errorMessage = "";
-  }
-
-  Widget showErrorMessage() {
-    if (_errorMessage.length > 0 && _errorMessage != null) {
-      return new Text(
-        _errorMessage,
-        style: TextStyle(
-            fontSize: 13.0,
-            color: Colors.red,
-            height: 1.0,
-            fontWeight: FontWeight.w300),
-      );
-    } else {
-      return new Container(
-        height: 0.0,
-      );
-    }
   }
 
   @override

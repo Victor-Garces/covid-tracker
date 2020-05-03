@@ -53,10 +53,12 @@ class _MapsPageState extends State<MapsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: getMap(),
-      floatingActionButton: new FloatingActionButton(
+      floatingActionButton: new FloatingActionButton.extended(
         onPressed: () {
           Navigator.pop(context, point);
         },
+        icon: Icon(Icons.check),
+        label: Text('Confirmar'),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:myapp/pages/root_page.dart';
-import 'package:myapp/services/auth.dart';
+import 'package:myapp/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
             PageTransition(
               type: PageTransitionType.fade,
               child: RootPage(
-                auth: new Auth(),
+                auth: new AuthService(),
               ),
             ),
             (Route<dynamic> route) => false));

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/interfaces/base_auth.dart';
 import 'package:myapp/pages/root_page.dart';
-import 'package:myapp/services/auth.dart';
+import 'package:myapp/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -43,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
           PageTransition(
             type: PageTransitionType.fade,
             child: RootPage(
-              auth: new Auth(),
+              auth: new AuthService(),
             ),
           ),
           (Route<dynamic> route) => false);

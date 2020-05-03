@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/pages/home_page.dart';
 import 'package:myapp/pages/search_page.dart';
 import 'package:myapp/pages/settings_page.dart';
-import 'package:myapp/services/auth.dart';
+import 'package:myapp/services/auth_service.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -49,7 +49,7 @@ class AppDrawer extends StatelessWidget {
                         Divider(),
                         buildListTile(context, 'Configuración',
                             page: SettingsPage(
-                              auth: new Auth(),
+                              auth: new AuthService(),
                             )),
                         buildListTile(context, 'Ayuda y recomendaciones',
                             iconData: Icons.help),

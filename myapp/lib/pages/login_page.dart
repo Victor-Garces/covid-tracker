@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/interfaces/base_auth.dart';
 import 'package:myapp/pages/signup_page.dart';
-import 'package:myapp/services/auth.dart';
+import 'package:myapp/services/auth_service.dart';
+import 'package:myapp/services/disease_service.dart';
+import 'package:myapp/services/user_service.dart';
 import 'package:page_transition/page_transition.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,14 +21,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    _errorMessage = "";
     _isLoading = false;
     super.initState();
   }
 
   String _email = "";
   String _password = "";
-  String _errorMessage;
 
   bool _isLoading;
 
@@ -145,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit() async {
     setState(() {
-      _errorMessage = "";
       _isLoading = true;
     });
     if (validateAndSave()) {
@@ -163,7 +162,6 @@ class _LoginPageState extends State<LoginPage> {
       } catch (e) {
         setState(() {
           _isLoading = false;
-          _errorMessage = e.message;
           _formKey.currentState.reset();
         });
       }
@@ -197,13 +195,14 @@ class _LoginPageState extends State<LoginPage> {
         PageTransition(
           type: PageTransitionType.fade,
           child: SignupPage(
-            auth: new Auth(),
+            auth: new AuthService(),
+            user: new UserService(),
+            disease: new DiseaseService(),
           ),
         ));
   }
 
   void resetForm() {
     _formKey.currentState.reset();
-    _errorMessage = "";
   }
 }
